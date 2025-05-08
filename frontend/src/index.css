@@ -1,0 +1,355 @@
+:root {
+  font-family: 'Poppins', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.95);
+  background-color: #0F0E17;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Sobrescrever cores do Bootstrap para tema escuro MinDark */
+body, 
+.bg-dark {
+  background-color: #0F0E17 !important;
+}
+
+.card,
+.modal-content,
+.dropdown-menu,
+.offcanvas {
+  background-color: #1A1A25 !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 20px !important;
+  overflow: hidden;
+}
+
+.modal-content {
+  backdrop-filter: blur(10px);
+}
+
+.text-dark {
+  color: #A7A9BE !important;
+}
+
+.text-light {
+  color: #FFFFFE !important;
+}
+
+.border {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.border-top {
+  border-top-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.border-bottom {
+  border-bottom-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.list-group-item {
+  background-color: #1A1A25;
+  border-color: rgba(255, 255, 255, 0.05);
+  color: #FFFFFE;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+  transform: translateX(5px);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Estilos padrão */
+a {
+  font-weight: 500;
+  color: #64DFDF;
+  text-decoration: inherit;
+  transition: all 0.3s ease;
+}
+a:hover {
+  color: #80FFDB;
+  transform: translateY(-2px);
+  text-shadow: 0 4px 8px rgba(100, 223, 223, 0.2);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.2em);
+  line-height: 1.1;
+  margin-bottom: 1.2rem;
+  position: relative;
+}
+
+h1:after {
+  content: "";
+  position: absolute;
+  bottom: -15px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: #64DFDF;
+  border-radius: 2px;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5em);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+h3 {
+  font-size: clamp(1.2rem, 3vw, 2em);
+  line-height: 1.3;
+  margin-bottom: 0.8rem;
+}
+
+p {
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+}
+
+button:not(.btn) {
+  border-radius: 12px;
+  border: 1px solid transparent;
+  padding: 0.8em 1.6em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #64DFDF;
+  color: #0F0E17;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0px 4px 12px rgba(100, 223, 223, 0.2);
+}
+button:not(.btn):hover {
+  border-color: #80FFDB;
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 15px rgba(100, 223, 223, 0.3);
+}
+button:not(.btn):focus,
+button:not(.btn):focus-visible {
+  outline: 3px solid rgba(100, 223, 223, 0.3);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+img:hover {
+  transform: scale(1.02);
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #13121D;
+}
+::-webkit-scrollbar-thumb {
+  background: #3F3D56;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5A5880;
+}
+
+/* Ajustes para o Bootstrap */
+.btn {
+  border-radius: 12px;
+  padding: 0.8em 1.6em;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.btn-primary {
+  background-color: #64DFDF !important;
+  border-color: #64DFDF !important;
+  color: #0F0E17 !important;
+  box-shadow: 0px 4px 12px rgba(100, 223, 223, 0.2) !important;
+}
+
+.btn-primary:hover {
+  background-color: #80FFDB !important;
+  border-color: #80FFDB !important;
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 15px rgba(100, 223, 223, 0.3) !important;
+}
+
+.btn-secondary {
+  background-color: #6C63FF !important;
+  border-color: #6C63FF !important;
+  color: #FFFFFE !important;
+  box-shadow: 0px 4px 12px rgba(108, 99, 255, 0.2) !important;
+}
+
+.btn-secondary:hover {
+  background-color: #8A84FF !important;
+  border-color: #8A84FF !important;
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 15px rgba(108, 99, 255, 0.3) !important;
+}
+
+/* Outras cores de botões */
+.btn-info {
+  background-color: #48BFE3 !important;
+  border-color: #48BFE3 !important;
+  color: #0F0E17 !important;
+  box-shadow: 0px 4px 12px rgba(72, 191, 227, 0.2) !important;
+}
+
+.btn-info:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 15px rgba(72, 191, 227, 0.3) !important;
+}
+
+.btn-success {
+  background-color: #72EFDD !important;
+  border-color: #72EFDD !important;
+  color: #0F0E17 !important;
+  box-shadow: 0px 4px 12px rgba(114, 239, 221, 0.2) !important;
+}
+
+.btn-success:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 15px rgba(114, 239, 221, 0.3) !important;
+}
+
+.btn-warning {
+  background-color: #FFB703 !important;
+  border-color: #FFB703 !important;
+  color: #0F0E17 !important;
+  box-shadow: 0px 4px 12px rgba(255, 183, 3, 0.2) !important;
+}
+
+.btn-warning:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 15px rgba(255, 183, 3, 0.3) !important;
+}
+
+.btn-danger {
+  background-color: #FF5C58 !important;
+  border-color: #FF5C58 !important;
+  color: #FFFFFE !important;
+  box-shadow: 0px 4px 12px rgba(255, 92, 88, 0.2) !important;
+}
+
+.btn-danger:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 15px rgba(255, 92, 88, 0.3) !important;
+}
+
+/* Animação de fade-in */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Espaçamento melhorado */
+.p-custom {
+  padding: 2rem;
+}
+
+.m-custom {
+  margin: 2rem;
+}
+
+/* Estilos para o botão de perfil */
+.profile-button {
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.profile-button:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* Melhorias para formulários */
+.form-control {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #FFFFFE;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  background-color: rgba(255, 255, 255, 0.07);
+  border-color: #64DFDF;
+  box-shadow: 0 0 0 3px rgba(100, 223, 223, 0.15);
+  outline: none;
+}
+
+/* Card melhorado */
+.card {
+  padding: 1.5rem;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.18);
+}
+
+/* Melhorias na navegação */
+.nav-link {
+  position: relative;
+  padding: 0.8rem 1.2rem;
+  margin: 0 0.3rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active {
+  background-color: rgba(100, 223, 223, 0.1);
+  color: #64DFDF;
+}
+
+.nav-link.active:after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background-color: #64DFDF;
+  border-radius: 2px;
+}
