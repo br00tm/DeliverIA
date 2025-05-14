@@ -10,6 +10,9 @@ import Profile from './pages/Profile'
 import Cart from './pages/Cart'
 import AIRecommend from './pages/AIRecommend'
 import Checkout from './pages/Checkout'
+import MyOrders from './pages/MyOrders'
+import OrderTracking from './pages/OrderTracking'
+import PaymentPix from './pages/PaymentPix'
 
 // Componentes
 import Navbar from './components/Navbar'
@@ -37,31 +40,31 @@ import Footer from './components/Footer'
 let theme = createTheme({
   palette: {
     primary: {
-      main: '#64DFDF',
-      light: '#80FFDB',
-      dark: '#48BFE3',
+      main: '#f44336',
+      light: '#ff7961',
+      dark: '#ba000d',
     },
     secondary: {
-      main: '#6C63FF',
-      light: '#8A84FF',
-      dark: '#5A54D4',
+      main: '#78909c',
+      light: '#a7c0cd',
+      dark: '#4b636e',
     },
     background: {
-      default: '#0F0E17',
-      paper: '#1A1A25',
+      default: '#121212',
+      paper: '#1e1e1e',
     },
     error: {
-      main: '#FF5C58',
+      main: '#f44336',
     },
     warning: {
-      main: '#FFB703',
+      main: '#ffa726',
     },
     success: {
-      main: '#72EFDD',
+      main: '#66bb6a',
     },
     text: {
-      primary: '#FFFFFE',
-      secondary: '#A7A9BE',
+      primary: '#ffffff',
+      secondary: '#b0bec5',
     },
     mode: 'dark',
   },
@@ -88,7 +91,7 @@ let theme = createTheme({
       fontWeight: 500,
     },
     button: {
-      fontWeight: 500,
+      fontWeight: 600,
       textTransform: 'none',
     },
     body1: {
@@ -99,27 +102,28 @@ let theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 16,
+    borderRadius: 8,
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          borderRadius: 8,
           padding: '10px 24px',
-          boxShadow: '0px 4px 12px rgba(100, 223, 223, 0.2)',
-          transition: 'all 0.3s ease',
+          boxShadow: 'none',
+          transition: 'all 0.2s ease',
+          fontWeight: 600,
         },
         containedPrimary: {
           '&:hover': {
-            boxShadow: '0px 6px 15px rgba(100, 223, 223, 0.3)',
-            transform: 'translateY(-2px)',
+            boxShadow: '0px 2px 8px rgba(244, 67, 54, 0.4)',
+            transform: 'translateY(-1px)',
           },
         },
         containedSecondary: {
           '&:hover': {
-            boxShadow: '0px 6px 15px rgba(108, 99, 255, 0.3)',
-            transform: 'translateY(-2px)',
+            boxShadow: '0px 2px 8px rgba(120, 144, 156, 0.4)',
+            transform: 'translateY(-1px)',
           },
         },
         outlinedPrimary: {
@@ -139,14 +143,14 @@ let theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          boxShadow: '0px 8px 20px rgba(0, 0, 0, 0.12)',
-          borderRadius: 20,
-          transition: 'all 0.3s ease',
+          boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.3)',
+          borderRadius: 8,
+          transition: 'all 0.2s ease',
           '&:hover': {
-            boxShadow: '0px 10px 25px rgba(0, 0, 0, 0.18)',
-            transform: 'translateY(-3px)',
+            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.4)',
+            transform: 'translateY(-2px)',
           },
-          backgroundColor: '#1A1A25',
+          backgroundColor: '#1e1e1e',
           border: '1px solid rgba(255, 255, 255, 0.05)',
           overflow: 'hidden',
         },
@@ -155,22 +159,22 @@ let theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
+          borderRadius: 8,
         },
         elevation1: {
-          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.15)',
+          boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.3)',
         },
         elevation2: {
-          boxShadow: '0px 6px 18px rgba(0, 0, 0, 0.2)',
+          boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.4)',
         },
       },
     },
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          borderRadius: 4,
           fontWeight: 500,
-          padding: '6px 2px',
+          padding: '4px 2px',
         },
       },
     },
@@ -178,9 +182,9 @@ let theme = createTheme({
       styleOverrides: {
         root: {
           "& .MuiOutlinedInput-root": {
-            borderRadius: 12,
+            borderRadius: 8,
             "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: '#64DFDF',
+              borderColor: '#f44336',
             },
           },
         },
@@ -196,16 +200,17 @@ let theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: 'rgba(15, 14, 23, 0.9)',
+          backgroundColor: '#1a1a1a',
           backdropFilter: 'blur(8px)',
-          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.15)',
+          boxShadow: '0px 1px 5px rgba(0, 0, 0, 0.3)',
+          color: '#ffffff',
         }
       }
     },
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: 'rgba(15, 14, 23, 0.95)',
+          backgroundColor: '#1a1a1a',
           backdropFilter: 'blur(10px)',
         }
       }
@@ -220,7 +225,7 @@ let theme = createTheme({
     MuiListItem: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          borderRadius: 8,
           margin: '4px 0',
           transition: 'all 0.2s ease',
           '&:hover': {
@@ -232,7 +237,7 @@ let theme = createTheme({
     MuiMenuItem: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          borderRadius: 8,
         }
       }
     },
@@ -437,9 +442,12 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/menu" element={<Menu />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route path="/profile/orders" element={<MyOrders />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/ai-recommend" element={<AIRecommend />} />
                   <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
+                  <Route path="/payment-pix/:orderId" element={<PaymentPix />} />
                 </Routes>
               </div>
             </div>

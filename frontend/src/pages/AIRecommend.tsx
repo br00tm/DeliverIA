@@ -111,8 +111,121 @@ const AIRecommend = () => {
   
   const handleAddToCart = (meal: Meal) => {
     // Adicionar ao carrinho - na implementação real poderia usar o Context API ou Redux
-    console.log('Adicionado ao carrinho:', meal)
-    navigate('/cart')
+    // Obter o carrinho atual do localStorage
+    const currentCart = localStorage.getItem('cart')
+    let cartItems = currentCart ? JSON.parse(currentCart) : []
+    
+    // Verificar se o item já existe no carrinho
+    const existingItemIndex = cartItems.findIndex((item: any) => item.id === meal.id)
+    
+    if (existingItemIndex >= 0) {
+      // Se o item já existe, incrementa a quantidade
+      cartItems[existingItemIndex].quantity += 1
+    } else {
+      // Garantir que a imagem existe e é válida usando imagens dos pratos do menu
+      let imageUrl;
+      
+      if (meal.image && meal.image.startsWith('http')) {
+        imageUrl = meal.image;
+      } else {
+        // Usar imagens dos pratos do menu baseado no nome
+        const dishName = meal.name.toLowerCase();
+        if (dishName.includes('frango') || dishName.includes('proteico')) {
+          imageUrl = 'https://static.wixstatic.com/media/611573_d4dbb2d55ab64755994f26e8891c04a7~mv2.jpg/v1/fit/w_700,h_700,al_c,q_80/file.png';
+        } else if (dishName.includes('salada') || dishName.includes('mediterr')) {
+          imageUrl = 'https://images.pexels.com/photos/1211887/pexels-photo-1211887.jpeg';
+        } else if (dishName.includes('salmão') || dishName.includes('peixe') || dishName.includes('wrap')) {
+          imageUrl = 'https://www.saboresajinomoto.com.br/uploads/images/recipes/wrap-de-salmao.jpg';
+        } else if (dishName.includes('vegano') || dishName.includes('vegetariano')) {
+          imageUrl = 'https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg';
+        } else if (dishName.includes('low-carb') || dishName.includes('omelete')) {
+          imageUrl = 'https://www.mundoboaforma.com.br/wp-content/uploads/2021/11/Omelete-low-carb-768x410.jpg';
+        } else if (dishName.includes('pudim') || dishName.includes('sobremesa')) {
+          imageUrl = 'https://www.apitadadopai.com/wp-content/webp-express/webp-images/uploads/2021/05/p1311253-1000x1000.jpg.webp';
+        } else if (dishName.includes('buddha') || dishName.includes('bowl')) {
+          imageUrl = 'https://images.pexels.com/photos/1833336/pexels-photo-1833336.jpeg';
+        } else if (dishName.includes('açaí') || dishName.includes('acai')) {
+          imageUrl = 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg';
+        } else {
+          imageUrl = 'https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg'; // Imagem padrão
+        }
+      }
+      
+      // Se não existe, adiciona novo item com quantidade 1
+      cartItems.push({
+        ...meal,
+        image: imageUrl,
+        quantity: 1,
+        tags: meal.tags || []
+      })
+    }
+    
+    // Salvar o carrinho atualizado no localStorage
+    localStorage.setItem('cart', JSON.stringify(cartItems))
+    
+    // Disparar evento de atualização do carrinho
+    const cartUpdateEvent = new CustomEvent('cartUpdated', {
+      detail: { cartItems: cartItems }
+    })
+    window.dispatchEvent(cartUpdateEvent)
+    
+    // Feedback para o usuário
+    alert(`${meal.name} foi adicionado ao carrinho!`)
+    
+    // Adicionar ao cardápio permanente também
+    addToMenu(meal)
+  }
+  
+  // Adicionar o prato ao menu
+  const addToMenu = (meal: Meal) => {
+    // Obter o cardápio atual do localStorage
+    const currentMenu = localStorage.getItem('menu')
+    let menuItems = currentMenu ? JSON.parse(currentMenu) : []
+    
+    // Verificar se o item já existe no cardápio
+    const existingItemIndex = menuItems.findIndex((item: any) => item.id === meal.id)
+    
+    if (existingItemIndex < 0) {
+      // Garantir que a imagem existe e é válida usando imagens dos pratos do menu
+      let imageUrl;
+      
+      if (meal.image && meal.image.startsWith('http')) {
+        imageUrl = meal.image;
+      } else {
+        // Usar imagens dos pratos do menu baseado no nome
+        const dishName = meal.name.toLowerCase();
+        if (dishName.includes('frango') || dishName.includes('proteico')) {
+          imageUrl = 'https://static.wixstatic.com/media/611573_d4dbb2d55ab64755994f26e8891c04a7~mv2.jpg/v1/fit/w_700,h_700,al_c,q_80/file.png';
+        } else if (dishName.includes('salada') || dishName.includes('mediterr')) {
+          imageUrl = 'https://images.pexels.com/photos/1211887/pexels-photo-1211887.jpeg';
+        } else if (dishName.includes('salmão') || dishName.includes('peixe') || dishName.includes('wrap')) {
+          imageUrl = 'https://www.saboresajinomoto.com.br/uploads/images/recipes/wrap-de-salmao.jpg';
+        } else if (dishName.includes('vegano') || dishName.includes('vegetariano')) {
+          imageUrl = 'https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg';
+        } else if (dishName.includes('low-carb') || dishName.includes('omelete')) {
+          imageUrl = 'https://www.mundoboaforma.com.br/wp-content/uploads/2021/11/Omelete-low-carb-768x410.jpg';
+        } else if (dishName.includes('pudim') || dishName.includes('sobremesa')) {
+          imageUrl = 'https://www.apitadadopai.com/wp-content/webp-express/webp-images/uploads/2021/05/p1311253-1000x1000.jpg.webp';
+        } else if (dishName.includes('buddha') || dishName.includes('bowl')) {
+          imageUrl = 'https://images.pexels.com/photos/1833336/pexels-photo-1833336.jpeg';
+        } else if (dishName.includes('açaí') || dishName.includes('acai')) {
+          imageUrl = 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg';
+        } else {
+          imageUrl = 'https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg'; // Imagem padrão
+        }
+      }
+      
+      // Se não existe, adiciona ao cardápio
+      menuItems.push({
+        ...meal,
+        image: imageUrl,
+        tags: meal.tags || [],
+        category: 'ia-recommend'
+      })
+      
+      // Salvar o cardápio atualizado no localStorage
+      localStorage.setItem('menu', JSON.stringify(menuItems))
+    }
   }
   
   const fetchRecommendations = async () => {
@@ -147,11 +260,42 @@ const AIRecommend = () => {
       const response = await apiService.getRecommendations(requestPayload)
       
       // Processar resposta - adicionando imagens para mock
-      const processedRecommendations = response.map(meal => ({
-        ...meal,
-        image: meal.image || `https://source.unsplash.com/random/800x600/?${meal.name.toLowerCase().replace(/\s+/g, '-')}`,
-        price: meal.price || (25 + Math.random() * 20) // Mock de preço se não existir
-      }))
+      const processedRecommendations = response.map(meal => {
+        // Usar URLs de imagem estáticas dos pratos do Menu
+        let imageUrl;
+        
+        if (meal.image && meal.image.startsWith('http')) {
+          imageUrl = meal.image;
+        } else {
+          // Usar imagens dos pratos do menu baseado no nome
+          const dishName = meal.name.toLowerCase();
+          if (dishName.includes('frango') || dishName.includes('proteico')) {
+            imageUrl = 'https://static.wixstatic.com/media/611573_d4dbb2d55ab64755994f26e8891c04a7~mv2.jpg/v1/fit/w_700,h_700,al_c,q_80/file.png';
+          } else if (dishName.includes('salada') || dishName.includes('mediterr')) {
+            imageUrl = 'https://images.pexels.com/photos/1211887/pexels-photo-1211887.jpeg';
+          } else if (dishName.includes('salmão') || dishName.includes('peixe') || dishName.includes('wrap')) {
+            imageUrl = 'https://www.saboresajinomoto.com.br/uploads/images/recipes/wrap-de-salmao.jpg';
+          } else if (dishName.includes('vegano') || dishName.includes('vegetariano')) {
+            imageUrl = 'https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg';
+          } else if (dishName.includes('low-carb') || dishName.includes('omelete')) {
+            imageUrl = 'https://www.mundoboaforma.com.br/wp-content/uploads/2021/11/Omelete-low-carb-768x410.jpg';
+          } else if (dishName.includes('pudim') || dishName.includes('sobremesa')) {
+            imageUrl = 'https://www.apitadadopai.com/wp-content/webp-express/webp-images/uploads/2021/05/p1311253-1000x1000.jpg.webp';
+          } else if (dishName.includes('buddha') || dishName.includes('bowl')) {
+            imageUrl = 'https://images.pexels.com/photos/1833336/pexels-photo-1833336.jpeg';
+          } else if (dishName.includes('açaí') || dishName.includes('acai')) {
+            imageUrl = 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg';
+          } else {
+            imageUrl = 'https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg'; // Imagem padrão
+          }
+        }
+        
+        return {
+          ...meal,
+          image: imageUrl,
+          price: meal.price || (25 + Math.random() * 20) // Mock de preço se não existir
+        }
+      })
       
       setRecommendations(processedRecommendations)
       setActiveStep(prevActiveStep => prevActiveStep + 1)
@@ -167,7 +311,7 @@ const AIRecommend = () => {
             id: 1,
             name: 'Bowl Proteico de Frango',
             description: 'Bowl de frango grelhado com quinoa, legumes, abacate e molho especial',
-            image: 'https://source.unsplash.com/random/800x600/?grilled-chicken-bowl',
+            image: 'https://static.wixstatic.com/media/611573_d4dbb2d55ab64755994f26e8891c04a7~mv2.jpg/v1/fit/w_700,h_700,al_c,q_80/file.png',
             price: 35.90,
             calories: 450,
             protein: 32,
@@ -186,7 +330,7 @@ const AIRecommend = () => {
             id: 2,
             name: 'Salada Mediterrânea',
             description: 'Mix de folhas, grão-de-bico, azeitonas, tomate cereja, pepino e queijo feta com molho de limão',
-            image: 'https://source.unsplash.com/random/800x600/?mediterranean-salad',
+            image: 'https://images.pexels.com/photos/1211887/pexels-photo-1211887.jpeg',
             price: 29.90,
             calories: 380,
             protein: 18,
@@ -205,7 +349,7 @@ const AIRecommend = () => {
             id: 3,
             name: 'Wrap de Salmão',
             description: 'Wrap integral recheado com salmão defumado, cream cheese, rúcula e pepino',
-            image: 'https://source.unsplash.com/random/800x600/?salmon-wrap',
+            image: 'https://www.saboresajinomoto.com.br/uploads/images/recipes/wrap-de-salmao.jpg',
             price: 32.90,
             calories: 420,
             protein: 28,

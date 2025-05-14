@@ -36,7 +36,8 @@ const categories = [
   { id: 'protein', name: 'Proteicos' },
   { id: 'vegan', name: 'Veganos' },
   { id: 'low-carb', name: 'Low Carb' },
-  { id: 'desserts', name: 'Sobremesas' }
+  { id: 'desserts', name: 'Sobremesas' },
+  { id: 'ia-recommend', name: 'Sugestões IA' }
 ]
 
 // Mock de dados para produtos (refeições)
@@ -45,7 +46,7 @@ const mockMeals = [
     id: 1,
     name: 'Bowl Proteico de Frango',
     description: 'Bowl de frango grelhado com quinoa, legumes, abacate e molho especial',
-    image: 'https://source.unsplash.com/random/800x600/?chicken-bowl',
+    image: 'https://static.wixstatic.com/media/611573_d4dbb2d55ab64755994f26e8891c04a7~mv2.jpg/v1/fit/w_700,h_700,al_c,q_80/file.png',
     price: 35.90,
     rating: 4.8,
     reviewCount: 124,
@@ -61,7 +62,7 @@ const mockMeals = [
     id: 2,
     name: 'Salada Mediterrânea',
     description: 'Mix de folhas, grão-de-bico, azeitonas, tomate cereja, pepino e queijo feta com molho de limão',
-    image: 'https://source.unsplash.com/random/800x600/?mediterranean-salad',
+    image: 'https://images.pexels.com/photos/1211887/pexels-photo-1211887.jpeg',
     price: 29.90,
     rating: 4.5,
     reviewCount: 87,
@@ -76,7 +77,7 @@ const mockMeals = [
     id: 3,
     name: 'Wrap de Salmão',
     description: 'Wrap integral recheado com salmão defumado, cream cheese, rúcula e pepino',
-    image: 'https://source.unsplash.com/random/800x600/?salmon-wrap',
+    image: 'https://www.saboresajinomoto.com.br/uploads/images/recipes/wrap-de-salmao.jpg',
     price: 32.90,
     rating: 4.7,
     reviewCount: 65,
@@ -91,7 +92,7 @@ const mockMeals = [
     id: 4,
     name: 'Bowl Vegano Tropical',
     description: 'Mix de vegetais, frutas tropicais, tofu grelhado e castanhas com molho de coco',
-    image: 'https://source.unsplash.com/random/800x600/?vegan-bowl',
+    image: 'https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg',
     price: 31.90,
     rating: 4.6,
     reviewCount: 53,
@@ -107,7 +108,7 @@ const mockMeals = [
     id: 5,
     name: 'Omelete Low Carb',
     description: 'Omelete recheado com espinafre, queijo, tomate e champignon',
-    image: 'https://source.unsplash.com/random/800x600/?omelette',
+    image: 'https://www.mundoboaforma.com.br/wp-content/uploads/2021/11/Omelete-low-carb-768x410.jpg',
     price: 26.90,
     rating: 4.4,
     reviewCount: 47,
@@ -122,7 +123,7 @@ const mockMeals = [
     id: 6,
     name: 'Pudim Proteico',
     description: 'Pudim cremoso com proteína isolada, baixo açúcar e calda de frutas vermelhas',
-    image: 'https://source.unsplash.com/random/800x600/?protein-pudding',
+    image: 'https://www.apitadadopai.com/wp-content/webp-express/webp-images/uploads/2021/05/p1311253-1000x1000.jpg.webp',
     price: 18.90,
     rating: 4.3,
     reviewCount: 32,
@@ -137,7 +138,7 @@ const mockMeals = [
     id: 7,
     name: 'Buddha Bowl',
     description: 'Arroz integral, legumes assados, feijão preto, abacate e molho tahine',
-    image: 'https://source.unsplash.com/random/800x600/?buddha-bowl',
+    image: 'https://images.pexels.com/photos/1833336/pexels-photo-1833336.jpeg',
     price: 33.90,
     rating: 4.9,
     reviewCount: 112,
@@ -153,7 +154,7 @@ const mockMeals = [
     id: 8,
     name: 'Bowl de Açaí',
     description: 'Açaí batido com banana, coberto com granola, frutas frescas e mel',
-    image: 'https://source.unsplash.com/random/800x600/?acai-bowl',
+    image: 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg',
     price: 24.90,
     rating: 4.7,
     reviewCount: 89,
@@ -174,16 +175,98 @@ const Menu = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [favorites, setFavorites] = useState<number[]>([])
   const [loading, setLoading] = useState(false)
-  const [meals, setMeals] = useState(mockMeals)
+  const [meals, setMeals] = useState<any[]>([])
+  
+  // Função auxiliar para garantir que imagens existam
+  const ensureValidImage = (item: any) => {
+    if (item.image && item.image.startsWith('http')) {
+      return item.image;
+    } else {
+      // Usar imagens dos pratos do menu baseado no nome
+      const dishName = item.name.toLowerCase();
+      if (dishName.includes('frango') || dishName.includes('proteico')) {
+        return 'https://static.wixstatic.com/media/611573_d4dbb2d55ab64755994f26e8891c04a7~mv2.jpg/v1/fit/w_700,h_700,al_c,q_80/file.png';
+      } else if (dishName.includes('salada') || dishName.includes('mediterr')) {
+        return 'https://images.pexels.com/photos/1211887/pexels-photo-1211887.jpeg';
+      } else if (dishName.includes('salmão') || dishName.includes('peixe') || dishName.includes('wrap')) {
+        return 'https://www.saboresajinomoto.com.br/uploads/images/recipes/wrap-de-salmao.jpg';
+      } else if (dishName.includes('vegano') || dishName.includes('vegetariano')) {
+        return 'https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg';
+      } else if (dishName.includes('low-carb') || dishName.includes('omelete')) {
+        return 'https://www.mundoboaforma.com.br/wp-content/uploads/2021/11/Omelete-low-carb-768x410.jpg';
+      } else if (dishName.includes('pudim') || dishName.includes('sobremesa')) {
+        return 'https://www.apitadadopai.com/wp-content/webp-express/webp-images/uploads/2021/05/p1311253-1000x1000.jpg.webp';
+      } else if (dishName.includes('buddha') || dishName.includes('bowl')) {
+        return 'https://images.pexels.com/photos/1833336/pexels-photo-1833336.jpeg';
+      } else if (dishName.includes('açaí') || dishName.includes('acai')) {
+        return 'https://images.pexels.com/photos/1092730/pexels-photo-1092730.jpeg';
+      } else {
+        return 'https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg'; // Imagem padrão
+      }
+    }
+  };
+
+  // Carregar dados iniciais, incluindo pratos do localStorage
+  useEffect(() => {
+    const loadInitialData = () => {
+      // Obter pratos do menu salvos no localStorage (vindos da recomendação IA)
+      const savedMenu = localStorage.getItem('menu')
+      const savedMenuItems = savedMenu ? JSON.parse(savedMenu) : []
+      
+      // Combinar com os dados mock
+      const allMeals = [...mockMeals]
+      
+      // Adicionar pratos do localStorage que não estejam no mockMeals
+      savedMenuItems.forEach((savedItem: any) => {
+        if (!allMeals.find(meal => meal.id === savedItem.id)) {
+          // Garantir que a imagem existe e é válida
+          savedItem.image = ensureValidImage(savedItem);
+          allMeals.push(savedItem)
+        }
+      })
+      
+      // Aplicar o filtro inicial baseado na categoria ativa
+      if (activeCategory === 'all') {
+        setMeals(allMeals)
+      } else if (activeCategory === 'ia-recommend') {
+        // Para a categoria IA, exibir apenas os pratos salvos do localStorage
+        setMeals(savedMenuItems)
+      } else {
+        const filteredMeals = allMeals.filter(meal => meal.category === activeCategory)
+        setMeals(filteredMeals)
+      }
+    }
+    
+    loadInitialData()
+  }, [])
   
   // Simula carregar os dados quando a categoria muda
   useEffect(() => {
     setLoading(true)
     setTimeout(() => {
+      // Obter pratos do menu salvos no localStorage
+      const savedMenu = localStorage.getItem('menu')
+      const savedMenuItems = savedMenu ? JSON.parse(savedMenu) : []
+      
+      // Combinar com os dados mock para ter todos os pratos disponíveis
+      const allMeals = [...mockMeals]
+      
+      // Adicionar pratos do localStorage que não estejam no mockMeals
+      savedMenuItems.forEach((savedItem: any) => {
+        if (!allMeals.find(meal => meal.id === savedItem.id)) {
+          // Garantir que a imagem existe e é válida
+          savedItem.image = ensureValidImage(savedItem);
+          allMeals.push(savedItem)
+        }
+      })
+      
       if (activeCategory === 'all') {
-        setMeals(mockMeals)
+        setMeals(allMeals)
+      } else if (activeCategory === 'ia-recommend') {
+        // Para a categoria IA, exibir apenas os pratos salvos do localStorage
+        setMeals(savedMenuItems)
       } else {
-        const filteredMeals = mockMeals.filter(meal => meal.category === activeCategory)
+        const filteredMeals = allMeals.filter(meal => meal.category === activeCategory)
         setMeals(filteredMeals)
       }
       setLoading(false)
@@ -192,18 +275,37 @@ const Menu = () => {
   
   // Filtra os produtos com base na pesquisa
   useEffect(() => {
+    // Obter pratos do menu salvos no localStorage
+    const savedMenu = localStorage.getItem('menu')
+    const savedMenuItems = savedMenu ? JSON.parse(savedMenu) : []
+    
+    // Combinar com os dados mock para ter todos os pratos disponíveis
+    const allMeals = [...mockMeals]
+    
+    // Adicionar pratos do localStorage que não estejam no mockMeals
+    savedMenuItems.forEach((savedItem: any) => {
+      if (!allMeals.find(meal => meal.id === savedItem.id)) {
+        // Garantir que a imagem existe e é válida
+        savedItem.image = ensureValidImage(savedItem);
+        allMeals.push(savedItem)
+      }
+    })
+    
     if (searchTerm.trim() === '') {
       if (activeCategory === 'all') {
-        setMeals(mockMeals)
+        setMeals(allMeals)
+      } else if (activeCategory === 'ia-recommend') {
+        // Para a categoria IA, exibir apenas os pratos salvos do localStorage
+        setMeals(savedMenuItems)
       } else {
-        const filteredMeals = mockMeals.filter(meal => meal.category === activeCategory)
+        const filteredMeals = allMeals.filter(meal => meal.category === activeCategory)
         setMeals(filteredMeals)
       }
     } else {
-      const searchResults = mockMeals.filter(meal => 
+      const searchResults = allMeals.filter(meal => 
         meal.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
         meal.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        meal.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+        (meal.tags && meal.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase())))
       )
       setMeals(searchResults)
     }
@@ -226,8 +328,41 @@ const Menu = () => {
   }
   
   const addToCart = (meal: any) => {
-    // Implementar lógica de adicionar ao carrinho
-    console.log('Adicionado ao carrinho:', meal)
+    // Obter o carrinho atual do localStorage
+    const currentCart = localStorage.getItem('cart')
+    let cartItems = currentCart ? JSON.parse(currentCart) : []
+    
+    // Verificar se o item já existe no carrinho
+    const existingItemIndex = cartItems.findIndex((item: any) => item.id === meal.id)
+    
+    if (existingItemIndex >= 0) {
+      // Se o item já existe, incrementa a quantidade
+      cartItems[existingItemIndex].quantity += 1
+    } else {
+      // Garantir que a imagem é válida
+      const imageUrl = ensureValidImage(meal);
+      
+      // Se não existe, adiciona novo item com quantidade 1
+      cartItems.push({
+        ...meal,
+        image: imageUrl,
+        quantity: 1
+      })
+    }
+    
+    // Salvar o carrinho atualizado no localStorage
+    localStorage.setItem('cart', JSON.stringify(cartItems))
+    
+    // Dispara um evento personalizado para notificar outros componentes
+    const cartUpdateEvent = new CustomEvent('cartUpdated', {
+      detail: {
+        cartItems: cartItems
+      }
+    })
+    window.dispatchEvent(cartUpdateEvent)
+    
+    // Feedback para o usuário
+    alert(`${meal.name} foi adicionado ao carrinho!`)
   }
   
   return (
@@ -241,7 +376,7 @@ const Menu = () => {
           bgcolor: 'primary.main', 
           color: 'white',
           borderRadius: 3,
-          backgroundImage: 'linear-gradient(rgba(34, 87, 122, 0.8), rgba(34, 87, 122, 1)), url(https://source.unsplash.com/random/1200x300/?healthy-food)',
+          backgroundImage: 'linear-gradient(rgba(34, 87, 122, 0.8), rgba(34, 87, 122, 1)), url(https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
@@ -467,4 +602,4 @@ const Menu = () => {
   )
 }
 
-export default Menu 
+export default Menu

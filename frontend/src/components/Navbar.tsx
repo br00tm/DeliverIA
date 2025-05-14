@@ -51,6 +51,7 @@ const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [scrolled, setScrolled] = useState(false)
+  const [cartItemCount, setCartItemCount] = useState(0)
   
   // Detectar rolagem da página para efeitos visuais
   useEffect(() => {
@@ -66,6 +67,31 @@ const Navbar = () => {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [scrolled])
+  
+  // Carregar a contagem de itens do carrinho do localStorage
+  useEffect(() => {
+    const updateCartCount = () => {
+      const cartItems = localStorage.getItem('cart')
+      if (cartItems) {
+        const items = JSON.parse(cartItems)
+        const count = items.reduce((acc: number, item: any) => acc + item.quantity, 0)
+        setCartItemCount(count)
+      } else {
+        setCartItemCount(0)
+      }
+    }
+    
+    // Atualizar a contagem ao montar o componente
+    updateCartCount()
+    
+    // Configurar o ouvinte de eventos para atualizar quando o carrinho for modificado
+    window.addEventListener('cartUpdated', updateCartCount)
+    
+    // Remover o ouvinte ao desmontar
+    return () => {
+      window.removeEventListener('cartUpdated', updateCartCount)
+    }
+  }, [])
   
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -241,11 +267,11 @@ const Navbar = () => {
       <AppBar 
         position="sticky" 
         color="default" 
-        elevation={scrolled ? 4 : 0}
+        elevation={scrolled ? 2 : 1}
         sx={{
-          bgcolor: scrolled ? 'rgba(255, 255, 255, 0.95)' : 'background.default',
-          backdropFilter: scrolled ? 'blur(10px)' : 'none',
-          borderBottom: `1px solid ${alpha(theme.palette.divider, scrolled ? 0.08 : 0)}`,
+          bgcolor: 'rgba(26, 26, 26, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: `1px solid ${alpha(theme.palette.divider, scrolled ? 0.2 : 0.1)}`,
           transition: 'all 0.3s ease-in-out',
         }}
       >
@@ -254,20 +280,21 @@ const Navbar = () => {
             disableGutters
             sx={{ 
               height: scrolled ? (isMobile ? 64 : 70) : (isMobile ? 70 : 80),
-              transition: 'height 0.3s ease-in-out'
+              transition: 'height 0.3s ease-in-out',
+              px: 2
             }}
           >
             {isMobile ? (
               <>
                 <IconButton
                   edge="start"
-                  color="inherit"
+                  color="primary"
                   aria-label="menu"
                   onClick={toggleDrawer(true)}
                   sx={{ 
                     mr: 1.5,
                     '&:hover': {
-                      backgroundColor: alpha(theme.palette.primary.main, 0.1)
+                      backgroundColor: alpha(theme.palette.primary.light, 0.1)
                     }
                   }}
                 >
@@ -293,27 +320,27 @@ const Navbar = () => {
                 mr: 4
               }}
             >
-              <Avatar 
-                sx={{ 
-                  bgcolor: theme.palette.primary.main, 
+              <Box
+                sx={{
+                  bgcolor: theme.palette.primary.main,
+                  borderRadius: '50%',
                   width: isMobile ? 36 : 40,
                   height: isMobile ? 36 : 40,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   mr: 1.5,
-                  transition: 'all 0.3s ease',
-                  boxShadow: `0 4px 8px ${alpha(theme.palette.primary.main, 0.25)}`
+                  boxShadow: '0 2px 6px rgba(244, 67, 54, 0.3)'
                 }}
               >
-                <RestaurantMenu fontSize={isMobile ? "small" : "medium"} />
-              </Avatar>
+                <RestaurantMenu sx={{ color: 'white', fontSize: isMobile ? '1.2rem' : '1.4rem' }} />
+              </Box>
               <Typography
                 variant={isMobile ? "h6" : "h5"}
                 sx={{ 
                   flexGrow: isMobile ? 1 : 0, 
-                  color: 'primary.main',
+                  color: 'white',
                   fontWeight: 700,
-                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
                   letterSpacing: '-0.02em'
                 }}
               >
@@ -325,21 +352,30 @@ const Navbar = () => {
               <Fade in={true}>
                 <Box sx={{ flexGrow: 1, display: 'flex', ml: 2 }}>
                   <Button
-                    color="inherit"
                     component={RouterLink}
                     to="/"
                     sx={{ 
-                      mr: 1.5, 
-                      borderRadius: 2,
+                      mr: 2, 
+                      borderRadius: 0,
                       px: 2,
-                      py: 1,
-                      color: isActiveRoute('/') ? theme.palette.primary.main : 'text.primary',
+                      py: 2.5,
+                      color: isActiveRoute('/') ? theme.palette.primary.light : 'rgba(255,255,255,0.8)',
+                      fontWeight: 500,
+                      position: 'relative',
                       '&:hover': {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.08)
+                        backgroundColor: 'transparent',
+                        color: 'white'
                       },
                       ...(isActiveRoute('/') && {
-                        fontWeight: 500,
-                        backgroundColor: alpha(theme.palette.primary.main, 0.08)
+                        '&::after': {
+                          content: '""',
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '3px',
+                          backgroundColor: theme.palette.primary.main
+                        }
                       })
                     }}
                   >
@@ -347,21 +383,30 @@ const Navbar = () => {
                   </Button>
                   
                   <Button
-                    color="inherit"
                     component={RouterLink}
                     to="/menu"
                     sx={{ 
-                      mr: 1.5, 
-                      borderRadius: 2,
+                      mr: 2, 
+                      borderRadius: 0,
                       px: 2,
-                      py: 1,
-                      color: isActiveRoute('/menu') ? theme.palette.primary.main : 'text.primary',
+                      py: 2.5,
+                      color: isActiveRoute('/menu') ? theme.palette.primary.light : 'rgba(255,255,255,0.8)',
+                      fontWeight: 500,
+                      position: 'relative',
                       '&:hover': {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.08)
+                        backgroundColor: 'transparent',
+                        color: 'white'
                       },
                       ...(isActiveRoute('/menu') && {
-                        fontWeight: 500,
-                        backgroundColor: alpha(theme.palette.primary.main, 0.08)
+                        '&::after': {
+                          content: '""',
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '3px',
+                          backgroundColor: theme.palette.primary.main
+                        }
                       })
                     }}
                   >
@@ -369,19 +414,32 @@ const Navbar = () => {
                   </Button>
                   
                   <Button
-                    color="secondary"
-                    variant="contained"
                     component={RouterLink}
                     to="/ai-recommend"
-                    startIcon={<Psychology />}
+                    startIcon={<Psychology sx={{ color: isActiveRoute('/ai-recommend') ? theme.palette.primary.light : 'inherit' }} />}
                     sx={{ 
-                      mr: 1.5,
-                      boxShadow: '0 4px 12px rgba(87, 204, 153, 0.3)',
-                      transition: 'all 0.3s ease',
+                      mr: 2, 
+                      borderRadius: 0,
+                      px: 2,
+                      py: 2.5,
+                      color: isActiveRoute('/ai-recommend') ? theme.palette.primary.light : 'rgba(255,255,255,0.8)',
+                      fontWeight: 500,
+                      position: 'relative',
                       '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 8px 16px rgba(87, 204, 153, 0.4)'
-                      }
+                        backgroundColor: 'transparent',
+                        color: 'white'
+                      },
+                      ...(isActiveRoute('/ai-recommend') && {
+                        '&::after': {
+                          content: '""',
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '3px',
+                          backgroundColor: theme.palette.primary.main
+                        }
+                      })
                     }}
                   >
                     Recomendação IA
@@ -393,7 +451,7 @@ const Navbar = () => {
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Tooltip title="Carrinho">
                 <IconButton
-                  color="inherit"
+                  color="primary"
                   component={RouterLink}
                   to="/cart"
                   sx={{ 
@@ -407,16 +465,15 @@ const Navbar = () => {
                   }}
                 >
                   <Badge 
-                    badgeContent={2} 
-                    color="secondary"
+                    badgeContent={cartItemCount} 
+                    color="primary"
                     sx={{
                       '& .MuiBadge-badge': {
-                        fontWeight: 'bold',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                        fontWeight: 'bold'
                       }
                     }}
                   >
-                    <ShoppingCart />
+                    <ShoppingCart sx={{ color: 'white' }} />
                   </Badge>
                 </IconButton>
               </Tooltip>
@@ -427,30 +484,19 @@ const Navbar = () => {
                   aria-label="conta do usuário"
                   aria-haspopup="true"
                   onClick={handleProfileMenuOpen}
-                  color="inherit"
+                  size="small"
                   sx={{ 
                     ml: { xs: 0, sm: 1 },
+                    color: theme.palette.primary.main,
                     '&:hover': {
-                      backgroundColor: alpha(theme.palette.primary.light, 0.1),
+                      backgroundColor: 'transparent',
+                      color: theme.palette.primary.dark,
                       transform: 'translateY(-2px)'
                     },
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: 32,
-                      height: 32,
-                      borderRadius: '50%',
-                      bgcolor: alpha(theme.palette.primary.main, 0.1),
-                      color: theme.palette.primary.main
-                    }}
-                  >
-                    <Person fontSize="small" />
-                  </Box>
+                  <Person fontSize="medium" />
                 </IconButton>
               </Tooltip>
               
@@ -463,44 +509,46 @@ const Navbar = () => {
                 PaperProps={{
                   elevation: 3,
                   sx: {
-                    borderRadius: 2,
+                    borderRadius: 1,
                     minWidth: 200,
-                    mt: 1.5,
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                    mt: 1,
+                    bgcolor: '#1e1e1e',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
+                    border: '1px solid rgba(255, 255, 255, 0.05)',
                     '& .MuiMenuItem-root': {
                       px: 2,
-                      py: 1.5,
+                      py: 1.2,
                       '&:hover': {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.08)
+                        backgroundColor: alpha(theme.palette.primary.main, 0.1)
                       }
                     }
                   }
                 }}
               >
                 <Box sx={{ px: 2, py: 1.5 }}>
-                  <Typography variant="subtitle2" fontWeight={600}>João Silva</Typography>
+                  <Typography variant="subtitle2" fontWeight={600} color="white">João Silva</Typography>
                   <Typography variant="body2" color="text.secondary">joao@email.com</Typography>
                 </Box>
-                <Divider />
+                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)' }} />
                 <MenuItem onClick={() => { handleMenuClose(); navigate('/profile') }}>
                   <ListItemIcon>
-                    <Person fontSize="small" />
+                    <Person fontSize="small" sx={{ color: theme.palette.primary.light }} />
                   </ListItemIcon>
-                  Minha Conta
+                  <Typography color="white">Minha Conta</Typography>
                 </MenuItem>
                 <MenuItem onClick={() => { handleMenuClose(); navigate('/profile/orders') }}>
                   <ListItemIcon>
-                    <ReceiptLong fontSize="small" />
+                    <ReceiptLong fontSize="small" sx={{ color: theme.palette.primary.light }} />
                   </ListItemIcon>
-                  Meus Pedidos
+                  <Typography color="white">Meus Pedidos</Typography>
                 </MenuItem>
                 <MenuItem onClick={() => { handleMenuClose(); navigate('/profile/preferences') }}>
                   <ListItemIcon>
-                    <Tune fontSize="small" />
+                    <Tune fontSize="small" sx={{ color: theme.palette.primary.light }} />
                   </ListItemIcon>
-                  Preferências
+                  <Typography color="white">Preferências</Typography>
                 </MenuItem>
-                <Divider />
+                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)' }} />
                 <MenuItem onClick={handleMenuClose} sx={{ color: theme.palette.error.main }}>
                   <ListItemIcon sx={{ color: theme.palette.error.main }}>
                     <Logout fontSize="small" />

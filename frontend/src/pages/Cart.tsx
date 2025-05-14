@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { 
   Box, 
   Typography, 
@@ -39,28 +39,37 @@ interface CartItem {
 
 const Cart = () => {
   const navigate = useNavigate()
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      name: 'Bowl Proteico de Frango',
-      price: 35.90,
-      quantity: 1,
-      image: 'https://source.unsplash.com/random/80x80/?chicken-bowl',
-      tags: ['Proteico', 'Low-carb']
-    },
-    {
-      id: 4,
-      name: 'Bowl Vegano Tropical',
-      price: 31.90,
-      quantity: 1,
-      image: 'https://source.unsplash.com/random/80x80/?vegan-bowl',
-      tags: ['Vegano', 'Rico em Fibras']
-    }
-  ])
+  const [cartItems, setCartItems] = useState<CartItem[]>([])
   
   const [promoCode, setPromoCode] = useState('')
   const [promoApplied, setPromoApplied] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  
+  // Carregar itens do carrinho do localStorage
+  useEffect(() => {
+    const loadCartItems = () => {
+      const storedCart = localStorage.getItem('cart')
+      if (storedCart) {
+        try {
+          const parsedCart = JSON.parse(storedCart)
+          setCartItems(parsedCart)
+        } catch (error) {
+          console.error('Erro ao carregar o carrinho:', error)
+          setCartItems([])
+        }
+      }
+    }
+    
+    loadCartItems()
+    
+    // Ouvir por atualizações no carrinho
+    const handleCartUpdate = () => loadCartItems()
+    window.addEventListener('cartUpdated', handleCartUpdate)
+    
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate)
+    }
+  }, [])
   
   // Cálculos
   const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
@@ -72,16 +81,32 @@ const Cart = () => {
   const updateQuantity = (id: number, newQuantity: number) => {
     if (newQuantity < 1) return // Não permitir quantidade menor que 1
     
-    setCartItems(prevItems => 
-      prevItems.map(item => 
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
+    const updatedCartItems = cartItems.map(item => 
+      item.id === id ? { ...item, quantity: newQuantity } : item
     )
+    
+    setCartItems(updatedCartItems)
+    localStorage.setItem('cart', JSON.stringify(updatedCartItems))
+    
+    // Disparar evento de atualização do carrinho
+    const cartUpdateEvent = new CustomEvent('cartUpdated', {
+      detail: { cartItems: updatedCartItems }
+    })
+    window.dispatchEvent(cartUpdateEvent)
   }
   
   // Remover item
   const removeItem = (id: number) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== id))
+    const updatedCartItems = cartItems.filter(item => item.id !== id)
+    
+    setCartItems(updatedCartItems)
+    localStorage.setItem('cart', JSON.stringify(updatedCartItems))
+    
+    // Disparar evento de atualização do carrinho
+    const cartUpdateEvent = new CustomEvent('cartUpdated', {
+      detail: { cartItems: updatedCartItems }
+    })
+    window.dispatchEvent(cartUpdateEvent)
   }
   
   // Aplicar código promocional
@@ -94,6 +119,51 @@ const Cart = () => {
       setPromoApplied(false)
     }
   }
+  
+  // Finalizar pedido e limpar carrinho
+  const finalizarPedido = () => {
+    if (isCartEmpty) return;
+    
+    // Gerar um ID único para o pedido
+    const orderId = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Criar objeto de pedido
+    const newOrder = {
+      id: orderId,
+      date: new Date(),
+      status: 'pending',
+      statusText: 'Em Preparo',
+      items: [...cartItems],
+      subtotal: subtotal,
+      deliveryFee: deliveryFee,
+      discount: discount,
+      total: total,
+      deliveryAddress: 'Rua Exemplo, 123 - Bairro, Cidade - Estado',
+      paymentMethod: 'PIX'
+    };
+    
+    // Obter pedidos existentes do localStorage
+    const existingOrdersJSON = localStorage.getItem('orders');
+    const existingOrders = existingOrdersJSON ? JSON.parse(existingOrdersJSON) : [];
+    
+    // Adicionar novo pedido à lista
+    existingOrders.unshift(newOrder);
+    
+    // Salvar pedidos atualizados no localStorage
+    localStorage.setItem('orders', JSON.stringify(existingOrders));
+    
+    // Limpar o carrinho
+    localStorage.setItem('cart', JSON.stringify([]));
+    
+    // Disparar evento de atualização do carrinho para refletir carrinho vazio
+    const cartUpdateEvent = new CustomEvent('cartUpdated', {
+      detail: { cartItems: [] }
+    });
+    window.dispatchEvent(cartUpdateEvent);
+    
+    // Redirecionar para checkout com o ID do pedido
+    navigate(`/payment-pix/${orderId}`);
+  };
   
   // Verificar se o carrinho está vazio
   const isCartEmpty = cartItems.length === 0
@@ -305,7 +375,7 @@ const Cart = () => {
               size="large"
               fullWidth
               startIcon={<CreditCard />}
-              onClick={() => navigate('/checkout')}
+              onClick={finalizarPedido}
               disabled={isCartEmpty}
             >
               Finalizar Pedido
